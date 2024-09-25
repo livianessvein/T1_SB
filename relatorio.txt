@@ -1,0 +1,21 @@
+Livian Essvein 2211667 3WA e Luiza Regnier 2211931 3WB
+
+* Relatório: T1 - Conversão entre UTF-8 e UTF-32
+
+Introdução:
+	Este relatório descreve o código desenvolvido para a conversão de arquivos de texto entre os formatos UTF-8 e UTF-32. O código consiste em duas funções principais: convUtf8p32, que converte um arquivo UTF-8 em UTF-32, e convUtf32p8, que realiza a conversão inversa.
+	
+O que está funcionando:
+1. Leitura de arquivos: O código consegue abrir e ler arquivos UTF-8 para a conversão.
+2. Conversão de UTF-8 para UTF-32: A função convUtf8p32 converte corretamente caracteres UTF-8 em UTF-32 e escreve o BOM adequado para arquivos UTF-32 little-endian.
+3. Conversão de UTF-32 para UTF-8: A função convUtf32p8 lê arquivos UTF-32 e converte os caracteres de volta para UTF-8, ignorando o BOM corretamente.
+4. Fechamento de arquivos: Os arquivos são fechados corretamente após a leitura e a gravação, evitando vazamentos de memória.
+
+O que não está funcionando:
+ - A princípio, nosso grupo não achou algo que não funcione
+ 
+Próximos passos:
+    Testes: Criar arquivos de teste com diferentes combinações de caracteres UTF-8 para garantir que a conversão funcione para todos os casos possíveis.
+
+Conclusão:
+    O código apresenta uma boa base para a conversão entre UTF-8 e UTF-32. O próximo passo será focar na depuração e implementação de testes para garantir a funcionalidade.

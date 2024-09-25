@@ -1,7 +1,7 @@
 // Você deve criar um arquivo fonte chamado converteutf832.c contendo as duas funções descritas acima, e funções auxiliares, se for o caso. Esse arquivo não deve conter uma função main!
 
-// LIVIAN ESSVEIN 2211667 3WA
-// LUIZA REGNIER 2211931 3WB
+/* LIVIAN ESSVEIN 2211667 3WA */
+/* LUIZA REGNIER 2211931 3WB */
 
 #include <stdio.h>
 #include "converteutf832.h"
