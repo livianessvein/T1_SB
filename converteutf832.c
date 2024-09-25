@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include "converteutf832.h"
 
-#define BOM_VALIDO_UTF32_LE 0xFFFE0000  // BOM para UTF-32 little-endian
+#define BOM_VALIDO_UTF32_LE 0x0000FEFF  // BOM para UTF-32 little-endian
 
-// Função auxiliar para converter um caractere UTF-8 para UTF-32
+// Função auxiliar para obter a quantidade de bytes de um caractere UTF-8
 size_t qtd_bytes_utf8(const unsigned char byte) {
     if ((byte & 0x80) == 0) {
         return 1;  // 1 byte
@@ -19,7 +19,8 @@ size_t qtd_bytes_utf8(const unsigned char byte) {
     } else if ((byte & 0xF8) == 0xF0) {
         return 4;  // 4 bytes
     }
-    // byte inválido (não esperado, dado que o arquivo está corretamente codificado)
+    // byte inválido
+    return 0;
 }
 
 int convUtf8p32(FILE *arquivo_entrada, FILE *arquivo_saida) {
@@ -29,7 +30,7 @@ int convUtf8p32(FILE *arquivo_entrada, FILE *arquivo_saida) {
     }
 
     // Escreve a marcação BOM para UTF-32 little-endian no início do arquivo de saída
-    unsigned int bom_marker = 0xFFFE0000;  // Little-endian BOM para UTF-32
+    unsigned int bom_marker = 0x0000FEFF;  // Little-endian BOM para UTF-32
     if (fwrite(&bom_marker, sizeof(unsigned int), 1, arquivo_saida) != 1) {
         fprintf(stderr, "Erro ao escrever BOM no arquivo de saída.\n");
         return -1;
@@ -41,25 +42,46 @@ int convUtf8p32(FILE *arquivo_entrada, FILE *arquivo_saida) {
         unsigned char utf8_byte = (unsigned char) byte;
         size_t qtd_bytes = qtd_bytes_utf8(utf8_byte);
 
+        // Verifica se o byte é inválido
+        if (qtd_bytes == 0) {
+            fprintf(stderr, "Caractere UTF-8 inválido encontrado: 0x%X\n", utf8_byte);
+            return -1;
+        }
+
         unsigned int utf32_char = 0;
         if (qtd_bytes == 1) { // 1 byte
             utf32_char = utf8_byte;
         } else if (qtd_bytes == 2) { // 2 bytes
             int next_byte = fgetc(arquivo_entrada);
+            if (next_byte == EOF) {
+                fprintf(stderr, "Erro: byte esperado, mas EOF encontrado.\n");
+                return -1;
+            }
             utf32_char = ((utf8_byte & 0x1F) << 6) | (next_byte & 0x3F);
         } else if (qtd_bytes == 3) { // 3 bytes
             int next_byte1 = fgetc(arquivo_entrada);
             int next_byte2 = fgetc(arquivo_entrada);
+            if (next_byte1 == EOF || next_byte2 == EOF) {
+                fprintf(stderr, "Erro: byte esperado, mas EOF encontrado.\n");
+                return -1;
+            }
             utf32_char = ((utf8_byte & 0x0F) << 12) | ((next_byte1 & 0x3F) << 6) | (next_byte2 & 0x3F);
         } else if (qtd_bytes == 4) { // 4 bytes
             int next_byte1 = fgetc(arquivo_entrada);
             int next_byte2 = fgetc(arquivo_entrada);
             int next_byte3 = fgetc(arquivo_entrada);
+            if (next_byte1 == EOF || next_byte2 == EOF || next_byte3 == EOF) {
+                fprintf(stderr, "Erro: byte esperado, mas EOF encontrado.\n");
+                return -1;
+            }
             utf32_char = ((utf8_byte & 0x07) << 18) | ((next_byte1 & 0x3F) << 12) | ((next_byte2 & 0x3F) << 6) | (next_byte3 & 0x3F);
         }
 
         // Escreve o caractere UTF-32 no arquivo de saída
-        fwrite(&utf32_char, sizeof(unsigned int), 1, arquivo_saida);
+        if (fwrite(&utf32_char, sizeof(unsigned int), 1, arquivo_saida) != 1) {
+            fprintf(stderr, "Erro ao escrever caractere UTF-32 no arquivo de saída.\n");
+            return -1;
+        }
     }
 
     return 0;
@@ -78,7 +100,7 @@ int convUtf32p8(FILE *arquivo_entrada, FILE *arquivo_saida) {
         return -1;
     }
     if (bom != BOM_VALIDO_UTF32_LE) {
-        fprintf(stderr, "BOM inválido.\n");
+        fprintf(stderr, "BOM inválido: 0x%X\n", bom);
         return -1;
     }
 
@@ -107,7 +129,7 @@ int convUtf32p8(FILE *arquivo_entrada, FILE *arquivo_saida) {
             utf8[3] = (unsigned char)((utf32_char & 0x3F) | 0x80);
             num_bytes = 4;
         } else {
-            fprintf(stderr, "Caractere UTF-32 fora do intervalo válido.\n");
+            fprintf(stderr, "Caractere UTF-32 fora do intervalo válido: 0x%X\n", utf32_char);
             return -1;
         }
 
