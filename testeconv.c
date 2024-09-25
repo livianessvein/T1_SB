@@ -1,5 +1,3 @@
-// Para testar seu programa, crie um outro arquivo, por exemplo, testeconv.c, contendo uma função main. 
-
 #include <stdio.h>
 #include "converteutf832.h"
 
