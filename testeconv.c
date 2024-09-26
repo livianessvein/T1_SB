@@ -3,7 +3,7 @@
 
 int main() {
     // Abrindo o arquivo UTF-8 para leitura e o arquivo UTF-32 para escrita
-    FILE *arquivo_entrada_utf8 = fopen("arquivo_pequeno_utf8.txt", "rb");
+    FILE *arquivo_entrada_utf8 = fopen("utf8_peq.txt", "rb");
     FILE *arquivo_saida_utf32 = fopen("arquivo_pequeno_utf32.bin", "wb");
 
     if (arquivo_entrada_utf8 == NULL || arquivo_saida_utf32 == NULL) {
@@ -25,7 +25,7 @@ int main() {
     fclose(arquivo_saida_utf32);
 
     // Abrindo o arquivo UTF-32 para leitura e o arquivo UTF-8 para escrita
-    FILE *arquivo_entrada_utf32 = fopen("arquivo_pequeno_utf32.bin", "rb");
+    FILE *arquivo_entrada_utf32 = fopen("utf32_peq.txt", "rb");
     FILE *arquivo_saida_utf8 = fopen("arquivo_pequeno_utf8_convertido.txt", "wb");
 
     if (arquivo_entrada_utf32 == NULL || arquivo_saida_utf8 == NULL) {
