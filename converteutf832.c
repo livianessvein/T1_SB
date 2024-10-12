@@ -1,5 +1,3 @@
-// Você deve criar um arquivo fonte chamado converteutf832.c contendo as duas funções descritas acima, e funções auxiliares, se for o caso. Esse arquivo não deve conter uma função main!
-
 /* LIVIAN ESSVEIN 2211667 3WA */
 /* LUIZA REGNIER 2211931 3WB */
 
@@ -12,17 +10,15 @@
 int convUtf8p32(FILE *arquivo_entrada, FILE *arquivo_saida) {
   unsigned int bom = BOM;
       if (arquivo_saida == NULL) {
-          fprintf(stderr, "Erro: arquivo inválido.\n");
+          fprintf(stderr, "Erro ao criar o arquivo de saída.\n");
           return -1;
       }
 
-      // Escreve a marcação BOM para UTF-32 little-endian no início do arquivo de saída
       if (fwrite(&bom, sizeof(unsigned int), 1, arquivo_saida) != 1) {
           fprintf(stderr, "Erro ao escrever BOM no arquivo de saída.\n");
           return -1;
       }
 
-      // Processa cada byte do arquivo de entrada
       int byte;
       while ((byte = fgetc(arquivo_entrada)) != EOF) {
           unsigned char utf8_byte = (unsigned char) byte;
@@ -32,18 +28,39 @@ int convUtf8p32(FILE *arquivo_entrada, FILE *arquivo_saida) {
           {
             cont=1;
           }
+
           while((comparaMask & utf8_byte) != 0x00)
           {
             cont++;
             comparaMask>>=1;
           }
+          if (cont>4)
+          {
+            fprintf(stderr, "Erro de leitura: byte UTF8 inicial invalido.\n");
+            return -1;
+          }
           unsigned int utf32_char = 0;
           if(cont==4){
             int next_byte1 = fgetc(arquivo_entrada);
+            if((next_byte1 & 0x80)!= 0x80)
+            {
+                fprintf(stderr, "Erro de leitura: byte UTF8 de continuação invalido.\n");
+                return -1;
+            }
             int next_byte2 = fgetc(arquivo_entrada);
+            if((next_byte2 & 0x80)!= 0x80)
+            {
+                fprintf(stderr, "Erro de leitura: byte UTF8 de continuação invalido.\n");
+                return -1;
+            }
             int next_byte3 = fgetc(arquivo_entrada);
+            if((next_byte3 & 0x80)!= 0x80)
+            {
+                fprintf(stderr, "Erro de leitura: byte UTF8 de continuação invalido.\n");
+                return -1;
+            }
             if (next_byte1 == EOF || next_byte2 == EOF || next_byte3 == EOF) {
-              fprintf(stderr, "Erro: byte esperado, mas EOF encontrado.\n");
+              fprintf(stderr, "Erro de leitura: byte UTF8 esperado, mas EOF encontrado.\n");
               return -1;
             }
             utf32_char = ((utf8_byte & 0x07) << 18) | ((next_byte1 & 0x3F) << 12) | ((next_byte2 & 0x3F) << 6) | (next_byte3 & 0x3F);
@@ -53,7 +70,7 @@ int convUtf8p32(FILE *arquivo_entrada, FILE *arquivo_saida) {
             int next_byte1 = fgetc(arquivo_entrada);
             int next_byte2 = fgetc(arquivo_entrada);
             if (next_byte1 == EOF || next_byte2 == EOF) {
-                fprintf(stderr, "Erro: byte esperado, mas EOF encontrado.\n");
+                fprintf(stderr, "Erro de leitura: byte UTF8 esperado, mas EOF encontrado.\n");
                 return -1;
             }
             utf32_char = ((utf8_byte & 0x0F) << 12) | ((next_byte1 & 0x3F) << 6) | (next_byte2 & 0x3F);
@@ -62,7 +79,7 @@ int convUtf8p32(FILE *arquivo_entrada, FILE *arquivo_saida) {
           else if (cont==2){
             int next_byte = fgetc(arquivo_entrada);
             if (next_byte == EOF) {
-                fprintf(stderr, "Erro: byte esperado, mas EOF encontrado.\n");
+                fprintf(stderr, "Erro de leitura: byte UTF8 esperado, mas EOF encontrado.\n");
                 return -1;
             }
               utf32_char = ((utf8_byte & 0x1F) << 6) | (next_byte & 0x3F);
@@ -72,7 +89,6 @@ int convUtf8p32(FILE *arquivo_entrada, FILE *arquivo_saida) {
             utf32_char = utf8_byte;
           }
           
-                  // Escreve o caractere UTF-32 no arquivo de saída
           if (fwrite(&utf32_char, sizeof(unsigned int), 1, arquivo_saida) != 1) {
               fprintf(stderr, "Erro ao escrever caractere UTF-32 no arquivo de saída.\n");
               return -1;
@@ -85,11 +101,10 @@ int convUtf8p32(FILE *arquivo_entrada, FILE *arquivo_saida) {
 
 int convUtf32p8(FILE *arquivo_entrada, FILE *arquivo_saida) {
     if (arquivo_saida == NULL) {
-        fprintf(stderr, "Erro: arquivo inválido.\n");
+        fprintf(stderr, "Erro ao criar o arquivo de saída.\n");
         return -1;
     }
 
-    // Verificar e remover o BOM UTF-32 do arquivo de entrada
     unsigned int bom;
     if (fread(&bom, sizeof(unsigned int), 1, arquivo_entrada) != 1) {
         fprintf(stderr, "Erro ao ler o BOM do arquivo de entrada.\n");
@@ -100,7 +115,6 @@ int convUtf32p8(FILE *arquivo_entrada, FILE *arquivo_saida) {
         return -1;
     }
 
-    // Processar cada caractere UTF-32 e converter para UTF-8
     unsigned int utf32_char;
     while (fread(&utf32_char, sizeof(unsigned int), 1, arquivo_entrada) == 1) {
         unsigned char utf8[4];

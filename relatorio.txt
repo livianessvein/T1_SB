@@ -3,7 +3,8 @@ Livian Essvein 2211667 3WA e Luiza Regnier 2211931 3WB
 * Relatório: T1 - Conversão entre UTF-8 e UTF-32
 
 Introdução:
-	Este relatório descreve o código desenvolvido para a conversão de arquivos de texto entre os formatos UTF-8 e UTF-32. O código consiste em duas funções principais: convUtf8p32, que converte um arquivo UTF-8 em UTF-32, e convUtf32p8, que realiza a conversão inversa.
+	Este relatório descreve o código desenvolvido para a conversão de arquivos de texto entre os formatos UTF-8 e UTF-32. 
+    O código consiste em duas funções principais: convUtf8p32 e convUtf32p8.
 	
 O que está funcionando:
 1. Leitura de arquivos: O código consegue abrir e ler arquivos UTF-8 para a conversão.
@@ -11,11 +12,55 @@ O que está funcionando:
 3. Conversão de UTF-32 para UTF-8: A função convUtf32p8 lê arquivos UTF-32 e converte os caracteres de volta para UTF-8, ignorando o BOM corretamente.
 4. Fechamento de arquivos: Os arquivos são fechados corretamente após a leitura e a gravação, evitando vazamentos de memória.
 
+Testes que fizemos:
+    convUtf8p32: 
+        teste 1: teste com o arquivo dado no enunciado
+            -> Saída como o esperado, arquivo convertido com sucesso.
+
+        teste 2: teste com um arquivo grande e com um emoji
+            -> Por exemplo, o arquivo UTF8 com o texto "A long time ago in a galáxia 🌍 far, far away...", ao converter para UTF32 tem a hexdump igual a:
+            
+                    0000000 feff 0000 0041 0000 0020 0000 006c 0000
+                    0000010 006f 0000 006e 0000 0067 0000 0020 0000
+                    0000020 0074 0000 0069 0000 006d 0000 0065 0000
+                    0000030 0020 0000 0061 0000 0067 0000 006f 0000
+                    0000040 0020 0000 0069 0000 006e 0000 0020 0000
+                    0000050 0061 0000 0020 0000 0067 0000 0061 0000
+                    0000060 006c 0000 00e1 0000 0078 0000 0069 0000
+                    0000070 0061 0000 0020 0000 f30d 0001 0020 0000
+                    0000080 0066 0000 0061 0000 0072 0000 002c 0000
+                    0000090 0020 0000 0066 0000 0061 0000 0072 0000
+                    00000a0 0020 0000 0061 0000 0077 0000 0061 0000
+                    00000b0 0079 0000 002e 0000 002e 0000 002e 0000
+                    00000c0 000a 0000 000a 0000                    
+                    00000c8
+
+
+        teste 3: teste com o arquivo vazio
+            -> Como o arquivo está vazio, no hexdump do arquivo utf8 não gerou saída alguma. 
+               Já com o hexdump do arquivo utf32 convertido contém apenas o caracter BOM, ou seja, saída esperada.
+        
+    convUtf32p8:
+        teste 1: teste com o arquivo dado no enunciado
+            -> Saída como o esperado, arquivo convertido com sucesso.
+        
+        teste 2: teste com arquivo vazio
+            -> Como o arquivo está vazio, ou seja, não existe nele o caracter BOM, então, deve haver erro na conversão, logo, saída esperada
+            -> Saída esperada: Erro ao ler o BOM do arquivo de entrada.
+                               Erro na conversão de UTF-32 para UTF-8.
+        
+        teste 3: teste com caracter BOM invalido
+            -> Se o primeiro caracter d arquivo for diferente do BOM, a saída relatará o erro de BOM invalido e não fará a conversão.
+            -> Exemplo de saída: BOM inválido: 0x53FEFF
+                                 Erro na conversão de UTF-32 para UTF-8.
+
+
+
 O que não está funcionando:
  - A princípio, nosso grupo não achou algo que não funcione
  
-Próximos passos:
-    Testes: Criar arquivos de teste com diferentes combinações de caracteres UTF-8 para garantir que a conversão funcione para todos os casos possíveis.
 
 Conclusão:
-    O código apresenta uma boa base para a conversão entre UTF-8 e UTF-32. O próximo passo será focar na depuração e implementação de testes para garantir a funcionalidade.
+    O código apresenta uma boa base para a conversão entre UTF-8 e UTF-32. 
+    A função converte8p32 também testa os bytes iniciais e de continuação para cada caracter lido, mas como o arquivo utf8 de entrada estava sempre
+    codificada corretamente não foi possivel implementar um teste.

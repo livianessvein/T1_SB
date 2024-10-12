@@ -3,8 +3,8 @@
 
 int main() {
     // Abrindo o arquivo UTF-8 para leitura e o arquivo UTF-32 para escrita
-    FILE *arquivo_entrada_utf8 = fopen("utf8_peq.txt", "rb");
-    FILE *arquivo_saida_utf32 = fopen("utf32_peq_convertido.bin", "wb");
+    FILE *arquivo_entrada_utf8 = fopen("utf8_grande.txt", "rb");
+    FILE *arquivo_saida_utf32 = fopen("utf32_Convertido.txt", "wb");
 
     if (arquivo_entrada_utf8 == NULL || arquivo_saida_utf32 == NULL) {
         fprintf(stderr, "Erro ao abrir arquivos para conversão de UTF-8 para UTF-32.\n");
