@@ -19,7 +19,7 @@ Testes que fizemos:
 
         teste 2: teste com um arquivo grande e com um emoji
             -> Por exemplo, o arquivo UTF8 com o texto "A long time ago in a galáxia 🌍 far, far away...", ao converter para UTF32 tem a hexdump igual a:
-            
+
                     0000000 feff 0000 0041 0000 0020 0000 006c 0000
                     0000010 006f 0000 006e 0000 0067 0000 0020 0000
                     0000020 0074 0000 0069 0000 006d 0000 0065 0000
@@ -50,7 +50,7 @@ Testes que fizemos:
                                Erro na conversão de UTF-32 para UTF-8.
         
         teste 3: teste com caracter BOM invalido
-            -> Se o primeiro caracter d arquivo for diferente do BOM, a saída relatará o erro de BOM invalido e não fará a conversão.
+            -> Se o primeiro caracter do arquivo for diferente do BOM, a saída relatará o erro de BOM invalido e não fará a conversão.
             -> Exemplo de saída: BOM inválido: 0x53FEFF
                                  Erro na conversão de UTF-32 para UTF-8.
 
